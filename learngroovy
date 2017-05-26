@@ -1,0 +1,18 @@
+http://groovy-lang.org/style-guide.html
+
+#no semicolon, "return" keyword optional, 
+
+
+========================Example Code ============================
+https://github.com/fabric8io/jenkins-pipeline-library/tree/master/vars
+https://github.com/fabric8io/fabric8-pipeline-library
+
+
+
+
++++++++++++++++++++++ Terminology and Definition +++++++++++++++++++++
+All valid @Declarative Pipelines must be enclosed within a pipeline block, for example:
+
+pipeline {
+    /* insert Declarative Pipeline here */
+}
