@@ -132,7 +132,7 @@ pipeline {
 
 # we can see that there are two main components. agent and stages. 
 # stages are many, agent might be from different sources. 
-#  every stage has agent and steps defined. 
+#  every stage has agent and steps defined. it may contain environment also. 
 # steps contains commands 
 
 # Defining agent none at the top-level of the Pipeline ensures that an Executor will not be unnecessarily. 
@@ -140,8 +140,49 @@ pipeline {
 # Execute the steps contained within this stage using the given container.
 # Execute the steps contained within this steps using a different image from the previous stage.
 
+================================
+++++++# environment +++++++++++++++
 
+Directive #2 
+#The @environment directive specifies a sequence of key-value pairs which will be defined as environment variables for the all steps, 
+#or stage-specific steps, depending on where the @environment directive is located within the Pipeline.
 
+#This directive supports a special helper method credentials() which can be used to access pre-defined Credentials by their
+#identifier in the Jenkins environment. For Credentials which are of type "Secret Text", the credentials() method will ensure 
+#that the environment variable specified contains the Secret Text contents. For Credentials which are of type "Standard username
+#and password", the environment variable specified will be set to username:password and two additional environment variables 
+#will be automatically be defined: MYVARNAME_USR and MYVARNAME_PSW respective.
+
+#Required        No
+#Parameters      None
+#Allowed         Inside the pipeline block, or within stage directives.
+
+#Example
+Jenkinsfile (Declarative Pipeline)
+pipeline {
+    agent any
+    environment { 
+        CC = 'clang'
+    }
+    stages {
+        stage('Example') {
+            environment { 
+                AN_ACCESS_KEY = credentials('my-prefined-secret-text') 
+            }
+            steps {
+                sh 'printenv'
+            }
+        }
+    }
+}
+
+=====conclusions==
+#	An environment directive used in the top-level pipeline block will apply to all steps within the Pipeline.
+#An environment directive defined within a stage will only apply the given environment variables to steps within the stage.
+#The environment block has a helper method credentials() defined which can be used to access pre-defined Credentials by their 
+#identifier in the Jenkins environment.
+
+==========now Lets see something called "options" , the 3rd type of directive==================
 
 
 
