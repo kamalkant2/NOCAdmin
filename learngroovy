@@ -1,7 +1,9 @@
 http://groovy-lang.org/style-guide.html
 
 #no semicolon, "return" keyword optional, 
-
+# Groovy lets you decide whether you use explicit strong typing, or when you use def.make a choice, either use def or a type.
+# When using def in Groovy, the actual type holder is Object (so you can assign any object to variables defined with def,
+# and return any kind of object if a method is declared returning def).
 
 ========================Example Code ============================
 https://github.com/fabric8io/jenkins-pipeline-library/tree/master/vars
@@ -11,8 +13,136 @@ https://github.com/fabric8io/fabric8-pipeline-library
 
 
 +++++++++++++++++++++ Terminology and Definition +++++++++++++++++++++
-All valid @Declarative Pipelines must be enclosed within a pipeline block, for example:
+All valid @Declarative Pipelines@ must be enclosed within a pipeline block, for example:
 
 pipeline {
     /* insert Declarative Pipeline here */
 }
+#The top-level of the Pipeline must be a block, specifically: pipeline { }
+#No semicolons as statement separators. Each statement has to be on its own line
+#Blocks must only consist of Sections, Directives, Steps, or assignment statements.
+
+#---@Sections@ in Declarative Pipeline typically contain one or more @Directives@ or @Steps@
+#--- Directives
+@agent 
+#The @agent directive@ specifies where the entire Pipeline, or a specific stage, will execute in the Jenkins environment 
+#depending on where the @agent directive is placed. The directive must be defined at the top-level inside the pipeline block, 
+#but stage-level usage is optional.
+#Required            Yes
+#Parameters          Described below
+#Allowed             In the top-level @pipeline block and each @stage block
+
+#@Parameters
+#In order to support the wide variety of use-cases Pipeline authors may have, the @agent directive supports a few different types of parameters. 
+#These parameters can be applied at the top-level of the @pipeline block, or within each @stage directive.
+#any
+#Execute the @Pipeline, or @stage, on any available agent. For example: agent any
+
+#none
+#When applied at the top-level of the @pipeline block no global agent will be allocated for the entire Pipeline run and 
+#each @stage directive will need to contain its own agent directive. For example: @agent none
+
+#label
+#Execute the @Pipeline, or @stage, on an agent available in the Jenkins environment with the provided label. For example: @agent { label 'my-defined-label' }
+
+#node
+#@agent { node { label 'labelName' } } behaves the same as agent { label 'labelName' }, but node allows 
+#for additional options (such as @customWorkspace).
+
+#@docker
+#Execute the @Pipeline, or @stage, with the given container which will be dynamically provisioned on a node pre-configured to accept 
+Docker-based Pipelines, or on a node matching the optionally defined label parameter. docker also optionally accepts an args parameter 
+which may contain arguments to pass directly to a docker run invocation. For example: agent { docker 'maven:3-alpine' } or
+
+agent {
+    docker {
+        image 'maven:3-alpine'
+        label 'my-defined-label'
+        args  '-v /tmp:/tmp'
+    }
+}
+
+
+#@dockerfile
+#Execute the Pipeline, or stage, with a container built from a @Dockerfile contained in the source repository. 
+#Conventionally this is the @Dockerfile in the root of the source repository: agent { dockerfile true }. 
+#If building a Dockerfile in another directory, use the dir option: agent { dockerfile { dir 'someSubDir' } }.
+
+#####Common Options
+#These are a few options for two or more @agent implementations. They are not required unless explicitly stated.
+
+# label
+#A string. The @label on which to run the Pipeline or individual stage.
+#This option is valid for @node, @docker and @dockerfile, and is required for @node.
+
+#customWorkspace
+#A string. Run the @Pipeline or individual @stage this @agent is applied to within this custom workspace, rather than the default. 
+#It can be either a relative path, in which case the custom workspace will be under the workspace root on the node, or an absolute path. 
+#For example:
+
+agent {
+    node {
+        label 'my-defined-label'
+        customWorkspace '/some/other/path'
+    }
+}
+This option is valid for node, docker and dockerfile.
+
+##reuseNode
+#A boolean, false by default. If true, run the container in the node specified at the top-level of the Pipeline, 
+#in the same workspace, rather than on a new node entirely.
+
+#This option is valid for docker and dockerfile, and only has an effect when used on an @agent for an individual @stage.
+
+Example
+Jenkinsfile (Declarative Pipeline)
+pipeline {
+    agent { docker 'maven:3-alpine' } 
+    stages {
+        stage('Example Build') {
+            steps {
+                sh 'mvn -B clean verify'
+            }
+        }
+    }
+}
+
+-----------------Stage-level agent directive-------------------------
+
+Jenkinsfile (Declarative Pipeline)
+pipeline {
+    agent none 
+    stages {
+        stage('Example Build') {
+            agent { docker 'maven:3-alpine' } 
+            steps {
+                echo 'Hello, Maven'
+                sh 'mvn --version'
+            }
+        }
+        stage('Example Test') {
+            agent { docker 'openjdk:8-jre' } 
+            steps {
+                echo 'Hello, JDK'
+                sh 'java -version'
+            }
+        }
+    }
+}
+
+# we can see that there are two main components. agent and stages. 
+# stages are many, agent might be from different sources. 
+#  every stage has agent and steps defined. 
+# steps contains commands 
+
+# Defining agent none at the top-level of the Pipeline ensures that an Executor will not be unnecessarily. 
+# --Using agent none requires that each stage directive contain an agent directive.
+# Execute the steps contained within this stage using the given container.
+# Execute the steps contained within this steps using a different image from the previous stage.
+
+
+
+
+
+
+
