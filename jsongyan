@@ -1,0 +1,32 @@
+json 
+
+Simple
+
+{"key":"value","key_next":"value_next"}
+
+Nested:
+
+one value can have the same structure inside:
+
+see below example
+
+{"key" : "value" , "key_next": {"intenal_key" : "internal_value"} }
+
+now if you have mutiple values than the nested values:
+
+{"key" : "value" , "key_next": [{"intenal_key1" : "internal_value1"}, {"intenal_key2" : "internal_value2"} ] }
+
+We can have multiple values in array without key pairs
+  "operatingsystemrelease": [
+        "5",
+        "6",
+        "7"
+      ]
+
+
+Everything is in double quote: 
+Multiple values are in array
+nested and arrays can be combined
+We can use true and false without quotes in values.
+
+=======================================
