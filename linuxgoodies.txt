@@ -1,0 +1,23 @@
+Mounting a windows smb shared folder in linux:-
+
+mount -t cifs -o username=<user>,password='new_password',domain=oradev <unc_smv_path> /<mount_name>
+
+/usr/sbin/mount.cifs <unc_path> /<mount_name> -o user=kk,,password='Password',domain=kkdev
+
+
+nfs mount in linux:
+
+echo "<server_name_fqdn>:/<path_to_mount> /<mount_name> nfs  soft,intr,rsize=8192,wsize=8192,rw" >> /etc/fstab
+mount -a
+validate
+cat /etc/fstab | grep "/<mount_name>" | wc -l
+
+for sunOs : file is /etc/vfstab
+for AIX it is: /etc/filesystems
+
+listing the cron jobs:
+crontab -u root -l 
+
+validate if package is installed:
+rpm -qa | grep "lftp" | wc -l
+
